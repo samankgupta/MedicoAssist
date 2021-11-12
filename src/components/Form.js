@@ -1,59 +1,61 @@
 import React from "react";
 import logo from "../images/logo.png"
-// import axios from "axios";
+import axios from "axios";
 
 export default function Example() {
 
     // const [returnData, setReturnData] = React.useState('')
     const [symptoms, setSymptoms] = React.useState([{ 'number': 1, 'name': '' }])
+    const [symptomData, setSymptomData] = React.useState([])
+    const [locationData, setLocationData] = React.useState([])
+    const [location, setLocation] = React.useState('')
     const [loading, setLoading] = React.useState(false)
 
-    // async function getToken() {
-    //     try {
-    //         const { data } = await axios.post('https://eba8b471.eu-gb.apigw.appdomain.cloud/token/?grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=pPpcfgq3UjLQ7uTNlBeJxAwAVcLeHbsiQlNReLTPLqeQ', null, null);
-    //             setToken(data.access_token) ;
-    //     } catch (error) {
-    //         console.log(error.response.data)
-    //     }
-    // }
+    async function getSymptoms() {
+        try {
+            const { data } = await axios.get('http://127.0.0.1:5000/disease')
+            setSymptomData(data.response)
+        } catch (error) {
+            console.log(error.response.data)
+        }
+    }
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
+    async function getLocations() {
+        try {
+            const { data } = await axios.get('http://127.0.0.1:5000/location')
+            setLocationData(data.response)
+        } catch (error) {
+            console.log(error.response.data)
+        }
+    }
 
-    //     let isError = false;
+    async function getDisease(postData) {
+        try {
+            const { data } = await axios.post('http://127.0.0.1:5000/', postData)
+            console.log(data)
+        } catch (error) {
+            console.log(error.response.data)
+        }
+    }
 
-    //     for (const [key, value] of Object.entries(val)) {
-    //         if(value === null || value === ''){
-    //             isError = true
-    //             setErrorMessage((errorMessage) => ({...errorMessage,[key]: true}))
-    //             if(key === "N" && document.getElementById("Nitrogen") !== null)
-    //                 document.getElementById("Nitrogen").classList.add('border-red-500')
-    //             else if(key === "P" && document.getElementById("Phosphorus") !== null)
-    //                 document.getElementById("Phosphorus").classList.add('border-red-500')
-    //             else if(key === "K" && document.getElementById("Potassium") !== null)
-    //                 document.getElementById("Potassium").classList.add('border-red-500')
-    //             else if(key === "temperature" && document.getElementById("Temperature") !== null)
-    //                 document.getElementById("Temperature").classList.add('border-red-500')
-    //             else if(key === "humidity" && document.getElementById("Humidity") !== null)
-    //                 document.getElementById("Humidity").classList.add('border-red-500')
-    //             else if(key === "ph" && document.getElementById("PH") !== null)
-    //                 document.getElementById("PH").classList.add('border-red-500')
-    //             else if(key === "rainfall" && document.getElementById("Rainfall") !== null)
-    //                 document.getElementById("Rainfall").classList.add('border-red-500')
-    //         }
-    //     }
-    //     if(!isError){
-    //         setLoading(true)
-    //         let pd = {
-    //             "input_data": [{
-    //                 "fields": ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"],
-    //                 "values": [[]]
-    //             }]
-    //         }
-    //         Object.values(val).map(v => pd.input_data[0].values[0].push(parseFloat(v)))
-    //         setPostData(pd)
-    //     }
-    // }
+    React.useEffect(() => {
+        getSymptoms();
+        getLocations();
+    }, [])
+
+    const handleSymptom = (sym, num) => {
+        symptoms.find(symp => symp === num).name = sym;
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let postData = {
+            "symptoms": [],
+            "location": location
+        }
+        symptoms.map(sym => sym.name != '' ? postData.symptoms.push(sym.name) : '')
+        getDisease(postData)
+    }
 
     // function openModal(key) {
     //     document.getElementById(key).showModal(); 
@@ -74,27 +76,6 @@ export default function Example() {
     //         document.getElementById(key).close();
     //         document.body.removeAttribute('style');
     //     }, 100);
-    // }
-
-    // const changeHandler = (name,value) => {
-    //     setVal({...val,[name]:value})
-    //     if(value !== null && value !== ''){
-    //         setErrorMessage((errorMessage) => ({...errorMessage,[name]: false}))
-    //         if(name === "N" && document.getElementById("Nitrogen") !== null)
-    //             document.getElementById("Nitrogen").classList.remove('border-red-500')
-    //         else if(name === "P" && document.getElementById("Phosphorus") !== null)
-    //             document.getElementById("Phosphorus").classList.remove('border-red-500')
-    //         else if(name === "K" && document.getElementById("Potassium") !== null)
-    //             document.getElementById("Potassium").classList.remove('border-red-500')
-    //         else if(name === "temperature" && document.getElementById("Temperature") !== null)
-    //             document.getElementById("Temperature").classList.remove('border-red-500')
-    //         else if(name === "humidity" && document.getElementById("Humidity") !== null)
-    //             document.getElementById("Humidity").classList.remove('border-red-500')
-    //         else if(name === "ph" && document.getElementById("PH") !== null)
-    //             document.getElementById("PH").classList.remove('border-red-500')
-    //         else if(name === "rainfall" && document.getElementById("Rainfall") !== null)
-    //             document.getElementById("Rainfall").classList.remove('border-red-500')
-    //     }
     // }
 
     const increaseInput = (e) => {
@@ -125,7 +106,7 @@ export default function Example() {
                                 <a href="/" ><img src={logo} alt="MedicoAssist Logo" className="h-24 filter drop-shadow hover:drop-shadow-lg mx-auto mt-8" /></a>
                                 <h1 className="text-3xl sm:text-4xl bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-800 to-green-500 text-center">DISEASE PREDICTION</h1>
                                 <div className="my-5 mb-16 shadow-xl">
-                                    <form id="recommendationForm">
+                                    <form onSubmit={handleSubmit}>
                                         <div className="shadow overflow-hidden sm:rounded-md">
                                             <div className="px-4 py-5 bg-white sm:p-6">
                                                 <div className="grid gap-y-7">
@@ -138,10 +119,13 @@ export default function Example() {
                                                                 id={"Symptom " + symp.number}
                                                                 name={"Symptom " + symp.number}
                                                                 autoComplete={"Symptom " + symp.number}
+                                                                onChange={(e) => handleSymptom(e.target.value, symp)}
                                                                 className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                                                             >
                                                                 <option disabled selected> Select A Symptom </option>
-
+                                                                {symptomData.length > 0 ? symptomData.map(sy => <option value={sy}>{sy.split('_')
+                                                                    .map(w => w[0].toUpperCase() + w.substr(1).toLowerCase())
+                                                                    .join(' ')}</option>) : ''}
                                                             </select>
                                                         </div>
                                                     )}
@@ -150,14 +134,16 @@ export default function Example() {
                                                         <label htmlFor="Location" className="block text-sm font-medium text-gray-700">
                                                             Location
                                                         </label>
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            name="Location"
+                                                        <select
                                                             id="Location"
+                                                            name="Location"
                                                             autoComplete="Location"
-                                                            className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm text-sm border-gray-300 rounded-md"
-                                                        />
+                                                            onChange={(e) => setLocation(e.target.value)}
+                                                            className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                                        >
+                                                            <option disabled selected> Select A Location </option>
+                                                            {locationData.length > 0 ? locationData.map(loc => <option value={loc}>{loc}</option>) : ''}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
