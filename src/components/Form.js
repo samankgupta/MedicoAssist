@@ -9,6 +9,7 @@ export default function Example() {
     const [symptomData, setSymptomData] = React.useState([])
     const [locationData, setLocationData] = React.useState([])
     const [location, setLocation] = React.useState('')
+    const [disease, setDisease] = React.useState('')
     const [loading, setLoading] = React.useState(false)
 
     async function getSymptoms() {
@@ -32,7 +33,9 @@ export default function Example() {
     async function getDisease(postData) {
         try {
             const { data } = await axios.post('http://127.0.0.1:5000/', postData)
-            console.log(data)
+            setDisease(data)
+            openModal('modal')
+            setLoading(false)
         } catch (error) {
             console.log(error.response.data)
         }
@@ -53,30 +56,41 @@ export default function Example() {
             "symptoms": [],
             "location": location
         }
-        symptoms.map(sym => sym.name != '' ? postData.symptoms.push(sym.name) : '')
-        getDisease(postData)
+        symptoms.map(sym => sym.name !== '' ? postData.symptoms.push(sym.name) : '')
+        if (postData.symptoms.length === 0 || postData.location === '')
+            alert("Select atleast one Symptom and a Location.");
+        else {
+            setLoading(true);
+            getDisease(postData);
+        }
     }
 
-    // function openModal(key) {
-    //     document.getElementById(key).showModal(); 
-    //     document.body.setAttribute('style', 'overflow: hidden;'); 
-    //     document.getElementById(key).children[0].scrollTop = 0; 
-    //     document.getElementById(key).children[0].classList.remove('opacity-0'); 
-    //     document.getElementById(key).children[0].classList.add('opacity-100');
-    //     document.addEventListener('click', function (e) {
-    //         if(e.target.className && e.target.className.includes("fixed"))
-    //             modalClose('modal')
-    //     }, false);
-    // }
+    const handleYes = (e) => {
+        e.preventDefault();
+        modalClose('modal');
+        openModal('doctormodal');
+    }
 
-    // function modalClose(key) {
-    //     document.getElementById(key).children[0].classList.remove('opacity-100');
-    //     document.getElementById(key).children[0].classList.add('opacity-0');
-    //     setTimeout(function () {
-    //         document.getElementById(key).close();
-    //         document.body.removeAttribute('style');
-    //     }, 100);
-    // }
+    function openModal(key) {
+        document.getElementById(key).showModal();
+        document.body.setAttribute('style', 'overflow: hidden;');
+        document.getElementById(key).children[0].scrollTop = 0;
+        document.getElementById(key).children[0].classList.remove('opacity-0');
+        document.getElementById(key).children[0].classList.add('opacity-100');
+        document.addEventListener('click', function (e) {
+            if (e.target.className && e.target.className.includes("fixed"))
+                modalClose('modal')
+        }, false);
+    }
+
+    function modalClose(key) {
+        document.getElementById(key).children[0].classList.remove('opacity-100');
+        document.getElementById(key).children[0].classList.add('opacity-0');
+        setTimeout(function () {
+            document.getElementById(key).close();
+            document.body.removeAttribute('style');
+        }, 100);
+    }
 
     const increaseInput = (e) => {
         e.preventDefault();
@@ -90,8 +104,35 @@ export default function Example() {
                     <div className="bg-white rounded-lg md:w-2/3 lg:w-1/3 relative">
                         <div>
                             <div className="px-7 pt-6 pb-2 grid grid-cols-2">
-                                <h1 className="font-semibold text-base">Recommended Crop</h1>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Multiplication_Sign.svg/1024px-Multiplication_Sign.svg.png" alt="Close" className="w-5 ml-auto cursor-pointer"></img>
+                                <h1 className="font-semibold text-left">Predicted Disease</h1>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Multiplication_Sign.svg/1024px-Multiplication_Sign.svg.png" alt="Close" className="w-5 ml-auto cursor-pointer" onClick={() => modalClose("modal")}></img>
+                            </div>
+                            {disease !== '' ?
+                                <div className="overflow-y-auto mt-4 mx-7">
+                                    <h1 className="text-lg bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-800 to-green-500 text-center mt-4"><span className="text-black font-normal">As per our Prediction Model, you are likely to have <br /></span>{disease.disease}.</h1>
+                                    <h1 className="text-lg text-black font-normal text-center mt-4">{disease.description}</h1>
+                                    <h1 className="text-lg text-black font-normal text-center mt-4">{disease.precaution}</h1>
+                                </div>
+                                : ''}
+                            <div className="overflow-y-auto mb-8 mx-6">
+                                <h1 className="text-xl text-black font-semibold text-center my-6">Do you want to consult a doctor?</h1>
+                                <button onClick={handleYes} className="text-white rounded-md px-5 py-2 bg-gradient-to-r from-green-600 to-green-300 hover:from-green-700 hover:to-green-500 mr-8">YES</button>
+                                <button onClick={() => modalClose("modal")} className="text-white rounded-md px-5 py-2 bg-gradient-to-r from-green-600 to-green-300 hover:from-green-700 hover:to-green-500">NO</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+            <dialog id="doctormodal" className="bg-transparent z-0 relative w-screen h-screen">
+                <div className="p-6 flex justify-center items-center fixed left-0 top-0 w-full h-full bg-gray-900 bg-opacity-50 z-50 transition-opacity duration-300 opacity-0">
+                    <div className="bg-white rounded-lg md:w-2/3 lg:w-1/3 relative">
+                        <div>
+                            <div className="px-7 pt-6 pb-2 grid grid-cols-2">
+                                <h1 className="font-semibold text-left">Appointment Booked</h1>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Multiplication_Sign.svg/1024px-Multiplication_Sign.svg.png" alt="Close" className="w-5 ml-auto cursor-pointer" onClick={() => modalClose("doctormodal")}></img>
+                            </div>
+                            <div className="overflow-y-auto mt-4 mx-12 mb-8">
+                                <h1 className="text-lg bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-800 to-green-500 text-center mt-4"><span className="text-black font-normal">Kindly consult </span> Dr. Naresh Trehan<span className="text-black font-normal"> of Cardiology Department on 12 November 2021 (Friday) at 11:30 AM.</span></h1>
                             </div>
                         </div>
                     </div>
