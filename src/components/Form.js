@@ -14,7 +14,7 @@ export default function Example() {
 
     async function getSymptoms() {
         try {
-            const { data } = await axios.get('http://127.0.0.1:5000/disease')
+            const { data } = await axios.get('https://medicoassist.herokuapp.com/disease')
             setSymptomData(data.response)
         } catch (error) {
             console.log(error.response.data)
@@ -23,7 +23,7 @@ export default function Example() {
 
     async function getLocations() {
         try {
-            const { data } = await axios.get('http://127.0.0.1:5000/location')
+            const { data } = await axios.get('https://medicoassist.herokuapp.com/location')
             setLocationData(data.response)
         } catch (error) {
             console.log(error.response.data)
@@ -32,7 +32,7 @@ export default function Example() {
 
     async function getDisease(postData) {
         try {
-            const { data } = await axios.post('http://127.0.0.1:5000/', postData)
+            const { data } = await axios.post('https://medicoassist.herokuapp.com/', postData)
             setDisease(data)
             openModal('modal')
             setLoading(false)
