@@ -3,7 +3,7 @@
     <a href="https://medicoassist.netlify.app/">View Website</a>
 </p>
 <p align="center"><a href="https://medicoassist.netlify.app/"><img src="./src/images/homeimagereadme.png" width="700"></a></p>
-<p align="center">Agri Cultivate AI is a device which can be used to collect symptoms from the patient and predict the disease. It will also help patients to book an appointment based on their disease severity. We have used Support Vector Classifier from the sklearn library in Python to create Hyperplanes to classify a disease based on the symptoms.
+<p align="center">MedicoAssist is a device which can be used to collect symptoms from the patient and predict the disease. It will also help patients to book an appointment based on their disease severity. We have used Support Vector Classifier from the sklearn library in Python to create Hyperplanes to classify a disease based on the symptoms.
 </p>
 
 ## Technologies Used
