@@ -1,3 +1,6 @@
 [submodule "disease-predictio"]
 	path = disease-predictio
 	url = https://github.com/ishivanshgoel/disease-prediction.git
+[submodule "backend"]
+	path = backend
+	url = https://github.com/ishivanshgoel/disease-prediction.git
